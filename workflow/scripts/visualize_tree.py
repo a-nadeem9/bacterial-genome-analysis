@@ -17,7 +17,6 @@ canvas, axes, mark = tree.draw(
     tip_labels_align=True
 )
 
-# FIX: Set the canvas background color to white before rendering
 canvas.style = {"background-color": "white"}
 
 # Save the canvas to a PNG file using the toyplot renderer
