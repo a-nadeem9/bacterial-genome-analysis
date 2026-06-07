@@ -1,0 +1,10 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  - pandas>=2,<3
+  - fastp>=0.23,<1
+  - nanofilt>=2.8,<3
+  - nanoplot>=1.41,<2
+  - multiqc>=1.19,<2

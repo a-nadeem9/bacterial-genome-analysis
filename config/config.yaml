@@ -1,0 +1,112 @@
+sample_sheet: "config/samples.tsv"
+
+# --- Database Paths ---
+database_paths:
+  busco_downloads: "databases/busco_downloads"
+  bakta_db: "databases/bakta_db"
+
+# --- QC parameters (using tool defaults) ---
+params:
+  fastp:
+    threads: 4
+    detect_adapter_for_pe: true
+    qualified_quality_phred: 15
+    length_required: 15
+    n_base_limit: 5
+    average_qual: 0
+    extra: ""
+  nanofilt:
+    min_length: 0
+    max_length: 1000000000
+    min_q: 7
+
+# --- Assembly parameters (using tool defaults) ---
+assembly:
+  spades:
+    threads: 8
+    memory: 32
+    k_mers: "21,33,55,77"
+    plasmid_mode: false
+    extra: ""
+  unicycler:
+    threads: 8
+    mode: "normal"
+    min_fasta_length: 100
+    keep_level: 0
+    extra: ""
+
+# --- Polishing and QC parameters ---
+polishing_qc:
+  pilon:
+    threads: 8
+    memory: 48 # Pilon can be memory intensive
+    extra: ""
+  busco:
+    threads: 8
+    # Both Klebsiella pneumoniae and Escherichia coli belong to the Enterobacterales order.
+    lineage: "enterobacterales_odb10"
+    extra: ""
+  quast:
+    threads: 8
+    extra: ""
+
+# --- Annotation Parameters ---
+annotation:
+  bakta:
+    threads: 1
+    # Specify 'light' or 'full' database type
+    database_type: "light"
+# --- Comparative Genomics Parameters ---
+comparative:
+  panaroo:
+    threads: 8
+    # Trigger core alignment with MAFFT in strict mode
+    extra: "--clean-mode strict --aligner mafft --alignment core"
+  iqtree:
+    threads: 8
+    # Using 1000 ultrafast bootstraps
+    extra: "-B 1000"
+  # Add sample names here to exclude them from the pangenome/phylogeny steps
+  blacklist:
+    - ""
+  # Add an external, pre-annotated GFF3 file as an outgroup
+  outgroup:
+    # The name that will appear on the tree
+    name: "salmonella"
+    # The path to the GFF3 file. Leave empty ("") to disable.
+    gff: ""
+
+# --- RGI Database Setup Parameters ---
+rgi_db:
+  data_url: "https://card.mcmaster.ca/latest/data"
+  variants_url: "https://card.mcmaster.ca/latest/variants"
+  wildcard_version: "4.0.0"
+
+# --- ABRicate Database Setup Parameters ---
+abricate_db_dir: "databases/abricate_db"
+abricate_databases:
+  - "card"
+  - "resfinder"
+  - "vfdb"
+  - "plasmidfinder"
+
+# --- Platon Database Setup Parameters ---
+platon_db:
+  dir: "databases/platon_db"
+  url: "https://zenodo.org/record/4066768/files/db.tar.gz"
+  md5: "6712717fedea5819ef0d63d7b2460fa4"
+# --- Optional Screening Parameters ---
+screening:
+  mlst:
+    run: true
+    scheme: "auto"
+  amr:
+    run: true
+    include_loose: false
+  virulence:
+    run: true
+    min_identity: 90
+    min_coverage: 95
+  plasmids:
+    run: true
+    threads: 8

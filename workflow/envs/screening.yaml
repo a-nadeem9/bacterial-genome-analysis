@@ -1,0 +1,9 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  - mlst>=2.19,<3
+  - rgi>=6,<7
+  - abricate
+  - biopython>=1.79

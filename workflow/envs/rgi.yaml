@@ -1,0 +1,8 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  - rgi>=6,<7
+  - biopython>=1.79
+  - wget

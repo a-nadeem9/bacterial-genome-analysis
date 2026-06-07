@@ -1,0 +1,73 @@
+# Import the pandas and os libraries
+import pandas as pd
+import os
+
+# --- Configuration Section ---
+# Load the main configuration file.
+configfile: "config/config.yaml"
+
+# Load the sample sheet.
+SAMPLE_SHEET = config.get("sample_sheet", "config/samples.tsv")
+SAMPLES = pd.read_csv(SAMPLE_SHEET, sep="\t").set_index("sample", drop=False)
+
+# --- Sample Lists ---
+# Create lists of samples for different logic paths.
+ALL_SAMPLES = SAMPLES.index.tolist()
+SAMPLES_WITH_LONG_READS = SAMPLES[SAMPLES.long_reads != '-'].index.tolist()
+SAMPLES_WITHOUT_LONG_READS = list(set(ALL_SAMPLES) - set(SAMPLES_WITH_LONG_READS))
+
+# --- Create a Filtered Sample List for Comparative Genomics ---
+BLACKLIST = [sample for sample in config["comparative"]["blacklist"] if sample]
+SAMPLES_FOR_COMPARATIVE = [sample for sample in ALL_SAMPLES if sample not in BLACKLIST]
+
+
+# --- Helper Function for fastp Adapters ---
+def get_adapter_flag():
+    if not config["params"]["fastp"]["detect_adapter_for_pe"]:
+        return "--disable_adapter_trimming"
+    return ""
+
+
+# --- Conditionally Define Final Outputs ---
+FINAL_TARGETS = [
+    # Mandatory outputs
+    "results/qc/busco/.downloaded",
+    "results/screening_summary_report.xlsx",
+    "results/multiqc/multiqc_report.html",
+    expand("results/qc/long_reads/{sample}/NanoPlot-report.html", sample=SAMPLES_WITH_LONG_READS),
+    expand("results/qc/quast/{sample}/report.html", sample=ALL_SAMPLES),
+    expand("results/qc/busco/{sample}/short_summary.specific.{lineage}.{sample}.txt",
+            sample=ALL_SAMPLES,
+            lineage=config["polishing_qc"]["busco"]["lineage"]),
+    expand("results/annotation/{sample}/{sample}.gff3", sample=ALL_SAMPLES),
+    "results/comparative/iqtree/core_genome.treefile",
+    "results/comparative/iqtree/core_genome_tree.png"
+]
+
+# Add optional screening outputs if their flags are set to true
+if config["screening"]["mlst"]["run"]:
+    FINAL_TARGETS.extend(expand("results/screening/mlst/{sample}.tsv", sample=ALL_SAMPLES))
+
+if config["screening"]["amr"]["run"]:
+    FINAL_TARGETS.extend(expand("results/screening/amr/{sample}.txt", sample=ALL_SAMPLES))
+
+if config["screening"]["virulence"]["run"]:
+    FINAL_TARGETS.extend(expand("results/screening/virulence/{sample}.tsv", sample=ALL_SAMPLES))
+    
+if config["screening"]["plasmids"]["run"]:
+    # This now matches the output of the corrected run_plasmids rule
+    FINAL_TARGETS.extend(expand("results/screening/plasmids/{sample}.tsv", sample=ALL_SAMPLES))
+# --- Target Rule ---
+rule all:
+    input:
+        FINAL_TARGETS
+
+# --- Include Modular Rule Files ---
+# This is where we tell Snakemake to load the rules from our .smk files
+include: "rules/qc.smk"
+include: "rules/assembly.smk"
+include: "rules/polishing_qc.smk"
+include: "rules/annotation.smk"
+include: "rules/comparative.smk"
+include: "rules/screening.smk"
+include: "rules/reporting.smk"
