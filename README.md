@@ -6,42 +6,8 @@ The workflow performs read QC, genome assembly, polishing, assembly QC, annotati
 
 ## Workflow Overview
 
-```mermaid
-flowchart TD
-    A["Sample sheet<br/>config/samples.tsv"] --> B["Raw reads"]
+![Workflow Overview](workflow_overview.png)
 
-    B --> C["Short-read QC<br/>fastp"]
-    B --> D{"Long reads?"}
-
-    D -- Yes --> E["Long-read QC<br/>NanoFilt + NanoPlot"]
-    D -- No --> F["Short-read only"]
-
-    C --> G{"Assembly"}
-    E --> G
-    F --> G
-
-    G -- Illumina only --> H["SPAdes assembly"]
-    G -- Hybrid --> I["Unicycler assembly"]
-
-    H --> J["Read mapping<br/>bwa-mem2 + samtools"]
-    I --> J
-    J --> K["Polishing<br/>Pilon"]
-
-    K --> L["Assembly QC<br/>QUAST + BUSCO"]
-    C --> M["MultiQC report"]
-    E --> M
-    L --> M
-
-    K --> N["Annotation<br/>Bakta"]
-    N --> O["Annotated GFF3 files"]
-
-    K --> P["Optional screening<br/>MLST / AMR / virulence / plasmids"]
-    P --> Q["Screening summary<br/>Excel"]
-
-    O --> R["Core genome alignment<br/>Panaroo"]
-    R --> S["Phylogeny<br/>IQ-TREE"]
-    S --> T["Tree figure<br/>PNG"]
-```
 
 ## Example Output
 
