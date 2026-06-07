@@ -47,7 +47,7 @@ flowchart TD
 
 Representative circular genome visualization generated from one sample.
 
-![Circular bacterial genome visualization](docs/figures/sample2_circular_genome.png)
+![Circular bacterial genome visualization](example_circular_genome.png)
 
 ## Main Steps
 
@@ -81,5 +81,3 @@ sample    illumina_r1                         illumina_r2                       
 sample1   data/SET1/sample1_R1.fastq.gz       data/SET1/sample1_R2.fastq.gz       data/SET1/sample1_long.fastq.gz
 sample2   data/SET2/sample2_R1.fastq.gz       data/SET2/sample2_R2.fastq.gz       -
 ```
-
-Use `-` in the `long_reads` column for short-read-only assemblies.
