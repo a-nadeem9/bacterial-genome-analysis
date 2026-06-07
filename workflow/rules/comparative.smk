@@ -1,5 +1,4 @@
 # --- Helper function to build the final list of GFFs for Panaroo ---
-# FIX: Added 'wildcards' as an argument to the function
 def get_panaroo_inputs(wildcards):
     # Start with the GFFs from the filtered sample list (excluding blacklisted samples)
     gff_files = expand("results/annotation/{sample}/{sample}.gff3", sample=SAMPLES_FOR_COMPARATIVE)
